@@ -53,7 +53,7 @@ int CargarClientes(char clientes[][2][40], int control){
         k++;
     }
     fclose(contadoretxt);
-    if(control == 0){
+    if(control == 1){
         FILE *contadortxt = fopen("TXT/Contadores.txt","w");
         fclose(contadortxt);
         FILE *contadorestxt = fopen("TXT/Contadores.txt","a");
@@ -61,7 +61,7 @@ int CargarClientes(char clientes[][2][40], int control){
         fclose(contadorestxt);
     }
 
-    while (fgets(linea, sizeof(linea), clientesstxt) != NULL && i < contadorclientes) {
+    while (fgets(linea, sizeof(linea), clientesstxt) != NULL && i <= contadorclientes) {
         char *token = strtok(linea, ",");
         int j = 0;
         
@@ -108,11 +108,11 @@ int CargarReservas(int reserva[][4], int contadorreserva, int control){
     }
     
     fclose(contadoretxt);
-        if (control == 1){
+    if (control == 1){
         FILE *contadortxt = fopen("TXT/Contadores.txt","w");
         fclose(contadortxt);
         FILE *contadorestxt = fopen("TXT/Contadores.txt","a");
-        fprintf(contadorestxt, "%d,%d\n",valor,contadorreserva);
+        fprintf(contadorestxt, "%d,%d\n",valor,contadorreserva+1);
         fclose(contadorestxt);
     }
     char linea[160];
@@ -217,6 +217,7 @@ void comprarTicket(char peliculas[][4][40],double precio[], char clientes[][2][4
     char cedula[40];
     int found = -1,control;
     int h = CargarClientes(clientes,control=0);
+    int controles = 1,controreserva=0;
     FILE *reservasrfile;
     for(int k = 0; k<10; k++){
  
@@ -255,7 +256,6 @@ void comprarTicket(char peliculas[][4][40],double precio[], char clientes[][2][4
         reservasrfile = fopen("TXT/Reservas.txt", "a");
         fprintf(reservasrfile, "%d,%d,%d,%d\n",found,reserva[k][0],reserva[k][2],reserva[k][3]);
         fclose(reservasrfile);
-        int controles = 1,controreserva=0;
         CargarReservas(reserva,controreserva,controles);
         break;
     }
