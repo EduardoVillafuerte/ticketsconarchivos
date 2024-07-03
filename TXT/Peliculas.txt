@@ -1,0 +1,10 @@
+1,Avatar,10:20,Fantasia
+2,Endgame,19:45,Accion
+3,Star Wars,12:10,Ciencia Ficcion
+4,Intensamente,13:15,Infantil
+5,Harry Potter,15:15,Ciencia Ficcion
+6,Rapidos y Furiosos,14:30,Accion
+7,Spiderman,18:40,Accion
+8,Batman,16:00,Accion
+9,Bad Boys,20:10,Comedia
+10,Gran Turismo,15:20,Aventura

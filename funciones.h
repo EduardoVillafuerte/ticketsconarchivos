@@ -6,4 +6,4 @@ void buscarporGenero(char peliculas[][4][40]);
 void comprarTicket(char peliculas[][4][40],double precio[], char clientes[][2][40],int reserva[][4]);                
 void verCompras(char peliculas[][4][40],double precio[], char clientes[][2][40],int reserva[][4],int contadorreserva);  
 void CargarPeliculas(char peliculas[][4][40]);
-void CargarClientes(char clientes[][2][40]);
+int CargarClientes(char clientes[][2][40], int control);

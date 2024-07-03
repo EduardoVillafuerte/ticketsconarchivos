@@ -8,8 +8,9 @@ int main (int argc, char *argv[]) {
     double precio[3]={7,3.5,3};
     char clientes[5][2][40];
     int contadorereservas = 0;
+    int control = 1;
     CargarPeliculas(peliculas);
-    CargarClientes(clientes);
+    CargarClientes(clientes,control);
 
 
     int opcion1=0,opcion2=0,opcion3=0;

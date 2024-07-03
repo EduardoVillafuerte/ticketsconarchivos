@@ -26,12 +26,42 @@ void CargarPeliculas(char peliculas[][4][40]){
     fclose(peliculastxt);
 }
 
-void CargarClientes(char clientes[][2][40]){
+int CargarClientes(char clientes[][2][40], int control){
     FILE *clientesstxt = fopen("TXT/Clientes.txt","r");
-    char linea[160];
-    int i = 0;
+    FILE *contadoretxt = fopen("TXT/Contadores.txt","r");
+    char linea[160], lineacontador[160];
+    int i = 0,k = 0,valor = 0,contadorclientes = 0;
 
-    while (fgets(linea, sizeof(linea), clientesstxt) != NULL && i < 5) {
+    while (fgets(lineacontador, sizeof(lineacontador), contadoretxt) != NULL && k < 1) {
+        char *token = strtok(lineacontador, ",");
+        int j = 0;
+        
+        while (token != NULL && j < 2) {
+            size_t len = strlen(token);
+            if (len > 0 && token[len - 1] == '\n') {
+                token[len - 1] = '\0';
+            }
+            if(j == 0) { 
+                contadorclientes = atoi(token);
+            }
+            else if(j == 1){
+                valor = atoi(token);
+            }
+            token = strtok(NULL, ",");
+            j++;
+        }
+        k++;
+    }
+    fclose(contadoretxt);
+    if(control == 0){
+        FILE *contadortxt = fopen("TXT/Contadores.txt","w");
+        fclose(contadortxt);
+        FILE *contadorestxt = fopen("TXT/Contadores.txt","a");
+        fprintf(contadorestxt, "%d,%d\n",contadorclientes+1,valor);
+        fclose(contadorestxt);
+    }
+
+    while (fgets(linea, sizeof(linea), clientesstxt) != NULL && i < contadorclientes) {
         char *token = strtok(linea, ",");
         int j = 0;
         
@@ -47,15 +77,16 @@ void CargarClientes(char clientes[][2][40]){
         i++;
     }
     fclose(clientesstxt);
+    return contadorclientes;
 }
 
-int CargarReservas(int reserva[][4], int contadorreserva){
+int CargarReservas(int reserva[][4], int contadorreserva, int control){
     FILE *reservastxt = fopen("TXT/Reservas.txt","r");
-    FILE *contadorestxt = fopen("TXT/Contadores.txt","r");
+    FILE *contadoretxt = fopen("TXT/Contadores.txt","r");
     char lineacontador[160];
-    int k = 0;     
+    int k = 0, valor = 0;     
 
-    while (fgets(lineacontador, sizeof(lineacontador), contadorestxt) != NULL && k < 1) {
+    while (fgets(lineacontador, sizeof(lineacontador), contadoretxt) != NULL && k < 1) {
         char *token = strtok(lineacontador, ",");
         int j = 0;
         
@@ -67,13 +98,23 @@ int CargarReservas(int reserva[][4], int contadorreserva){
             if(j == 1) { 
                 contadorreserva = atoi(token);
             }
+            else if(j == 0){
+                valor = atoi(token);
+            }
             token = strtok(NULL, ",");
             j++;
         }
         k++;
     }
-    fclose(contadorestxt);
-
+    
+    fclose(contadoretxt);
+        if (control == 1){
+        FILE *contadortxt = fopen("TXT/Contadores.txt","w");
+        fclose(contadortxt);
+        FILE *contadorestxt = fopen("TXT/Contadores.txt","a");
+        fprintf(contadorestxt, "%d,%d\n",valor,contadorreserva);
+        fclose(contadorestxt);
+    }
     char linea[160];
     int fila = 0;
     int i = 0;
@@ -113,8 +154,9 @@ void ingresarCliente(char clientes[][2][40]){
 }
 
 void imprimirClientes(char clientes[][2][40]){
-    CargarClientes(clientes);
-    for (int i = 0; i < 5; i++)
+    int control = 1;
+    int k = CargarClientes(clientes,control);
+    for (int i = 0; i < k; i++)
     {
         printf("%s\t\t%s\n",clientes[i][0],clientes[i][1]);
     }   
@@ -173,14 +215,15 @@ void buscarporGenero(char peliculas[][4][40]){
 void comprarTicket(char peliculas[][4][40],double precio[], char clientes[][2][40],int reserva[][4]){
 
     char cedula[40];
-    int found = -1;
+    int found = -1,control;
+    int h = CargarClientes(clientes,control=0);
     FILE *reservasrfile;
     for(int k = 0; k<10; k++){
  
         printf("Ingrese su cedula: ");
         scanf("%s", cedula);
         getchar();
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < h; i++) {
             if (strcmp(clientes[i][1], cedula) == 0) {
                 found = i;
                 reserva[k][1] = i;
@@ -212,40 +255,46 @@ void comprarTicket(char peliculas[][4][40],double precio[], char clientes[][2][4
         reservasrfile = fopen("TXT/Reservas.txt", "a");
         fprintf(reservasrfile, "%d,%d,%d,%d\n",found,reserva[k][0],reserva[k][2],reserva[k][3]);
         fclose(reservasrfile);
+        int controles = 1,controreserva=0;
+        CargarReservas(reserva,controreserva,controles);
         break;
     }
 }
 
-void verCompras(char peliculas[][4][40],double precio[], char clientes[][2][40],int reserva[][4],int contadorreserva){
+void verCompras(char peliculas[][4][40], double precio[], char clientes[][2][40], int reserva[][4], int contadorreserva) {
     char cedula[30];
-    int indice=-1, found =-1, contador = CargarReservas(reserva, contadorreserva);
-    printf("Ingerese la cedula para ver las compras\n");
+    int control = 0;
+    int indice = -1, found = -1;
+    int contador = CargarReservas(reserva, contadorreserva, control);
+    int clientesnumero = CargarClientes(clientes, control);
+
+    printf("Ingrese la cedula para ver las compras\n");
     getchar();
-    fgets(cedula,30,stdin);
+    fgets(cedula, sizeof(cedula), stdin);
 
     size_t len = strlen(cedula);
     if (len > 0 && cedula[len - 1] == '\n') {
         cedula[len - 1] = '\0';
-    } 
+    }
 
-    for(int y=0; y < 5; y++){
-        if(strcmp(clientes[y][1],cedula)==0){
+    for (int y = 0; y < clientesnumero; y++) {
+        if (strcmp(clientes[y][1], cedula) == 0) {
             indice = y;
             break;
         }
     }
-    if(indice == -1){
-        printf("La cedula no fue encontrada \n");
+    if (indice == -1) {
+        printf("La cedula no fue encontrada\n");
         return;
     }
-    for(int j = 0; j < contador; j++)
-    {
+
+    for (int j = 0; j < contador; j++) {
         if((reserva[j][0]==indice)){
             printf("%s\t\t%s\t\t%.2f\t\t%d\n",peliculas[reserva[j][1]-1][1],clientes[reserva[j][0]][0],precio[reserva[j][2]],reserva[j][3]);
             found = 1;
         }
     }
-    if(found == -1){
+    if (found == -1) {
         printf("El cliente no ha hecho alguna compra\n");
     }
-}  
+}
